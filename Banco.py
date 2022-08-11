@@ -1,6 +1,6 @@
-import string
-import secrets
-import time
+import string # senha
+import secrets #senha
+import time #painel
 
 class Cliente:
     def __init__(self,nome,mulher, renda):
@@ -119,10 +119,11 @@ class Conta_corrente():
         return f'{self.conta} {self.titulares}{self._senha}{self.saldo} {self.cheque_especial}'
 class Banco_delas():
     contas = []
+    tempo_painel = 2
     
 
     def __init__(self):
-       pass
+       self.tempo_painel = 2
 
     def abrir():
         Banco_delas()
@@ -156,8 +157,11 @@ class Banco_delas():
                 senha = (input('Digite sua senha:')).upper()
                 conta_valida =  Banco_delas.validar_titular(titular=titular, senha=senha)
                 conta = conta_valida.get('conta')
-                print(f'Número da conta: {conta.conta} Saldo: {conta.saldo} Titular(s):{conta.titulares}')
-                time.sleep(3)
+                permissao = conta.permissao_cheque()
+                if permissao:
+                    message = f' | Direito a cheque especial. Limite: {conta.cheque_especial} |'
+                print(f'Número da conta: {conta.conta} Saldo: {conta.saldo} Titular(s):{conta.titulares} {message} ')
+                time.sleep(Banco_delas.tempo_painel)
                 Banco_delas.voltar_menu()
                
             case "3":
@@ -170,9 +174,9 @@ class Banco_delas():
                 senha = (input('Digite sua senha:')).upper()
                 conta_valida =  Banco_delas.validar_titular(titular=titular, senha=senha)
                 conta = conta_valida.get('conta')
-                Banco_delas.add_titular(conta)
+                Banco_delas.add_titular(conta=conta)
                 print(f'Operação realizada. Titular(s):{conta.titulares}')   
-                time.sleep(3)
+                time.sleep(Banco_delas.tempo_painel)
                 Banco_delas.voltar_menu()         
       
             case "4":
@@ -186,7 +190,7 @@ class Banco_delas():
                 conta_valida =  Banco_delas.validar_titular(titular=titular, senha=senha)
                 conta = conta_valida.get('conta')
                 conta.sacar(valor=valor)
-                time.sleep(3)
+                time.sleep(Banco_delas.tempo_painel)
                 Banco_delas.voltar_menu()
             
             case "5":
@@ -199,7 +203,7 @@ class Banco_delas():
                 conta_valida =  Banco_delas.validar_titular(titular=titular, senha=senha)
                 conta = conta_valida.get('conta')
                 conta.depositar(valor=valor)
-                time.sleep(3)
+                time.sleep(Banco_delas.tempo_painel)
                 Banco_delas.voltar_menu()
             
             case "6":
@@ -211,7 +215,7 @@ class Banco_delas():
                 print('-------------------------------------------------------------------------------------------')
                 print(f'Você digitou {escolha}.Esta opção não esta no menu!\nEscolha entre os números de 1-7.\nCaso precise de ajuda, acesse: www.bancodela.com ou entre em contato com a sua agência')
                 print('-------------------------------------------------------------------------------------------')
-                time.sleep(7)
+                time.sleep(Banco_delas.tempo_painel)
                 Banco_delas.abrir()
 
     def voltar_menu():
@@ -232,23 +236,23 @@ class Banco_delas():
         for i, conta in enumerate(Banco_delas.contas):
             # from pdb import set_trace;set_trace()
             if senha == conta.get('senha'):
-                    print(f'achei {conta}')
+                    # print(f'achei {conta}')
                     conta_valida = conta
                     return conta_valida
             elif titular == conta.get('titular'):
                     print('Oops! Senha inválida')
-                    time.sleep(3)
+                    time.sleep(Banco_delas.tempo_painel)
                     Banco_delas.abrir()
             else:
                 print(f'\nConta não localizada. Titular informado: {titular}')
-                time.sleep(3)
+                time.sleep(Banco_delas.tempo_painel)
                 Banco_delas.abrir()
         else:
             print(f'\nConta não localizada. Titular informado: {titular}')
-            time.sleep(3)
+            time.sleep(Banco_delas.tempo_painel)
             Banco_delas.abrir()
     
-    def add_titular(self,conta:Conta_corrente):
+    def add_titular(conta:Conta_corrente):
         nome= input('Digite o nome do novo titular: ')
         mulher = input('Novo titular se declara mulher? 1-Sim 2-Não 3-Prefiro não responder! ')
         match mulher:
@@ -289,7 +293,7 @@ class Banco_delas():
         print('-------------------------------------------------------------------------------------------')
         print('Conta criada com sucesso! Bem vinda ao nosso Banco!')
         print(f'Salve sua senha de acesso gerada automaticamente:{senha}')
-        time.sleep(3)
+        time.sleep(Banco_delas.tempo_painel)
         Banco_delas.voltar_menu()
 
     def __str__(self):
