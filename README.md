@@ -13,6 +13,8 @@ Desafio do Banco_Delas realizado dentro da matéria de POO com python do curso: 
  - validacao simples de acesso do cliente com senha, usando o módulo padrão secrets para gerar números aleatórios criptograficamente fortes. Mas sem uso de hash para encriptografar. (https://docs.python.org/3/library/secrets.html)
 
 
+
+
 Meu linkedin
 https://www.linkedin.com/in/anacandidaquadros/
 
