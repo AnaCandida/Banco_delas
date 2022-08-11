@@ -1,14 +1,13 @@
 import string
 import secrets
 import time
-import statistics
 
 class Cliente:
-    def __init__(self,nome,mulher, renda,senha):
+    def __init__(self,nome,mulher, renda):
         self._nome = nome 
         self._mulher = mulher
         self._renda = float(renda) 
-        self._senha = senha
+        # self._senha = senha
  
     @property
     def nome(self):
@@ -28,15 +27,13 @@ class Cliente:
 
     def __str__(self):
         return (f'Cliente :{ self.nome} , mulher: {self.mulher} renda: {self.renda}, senha:{self.senha}')
-
-
 class Conta_corrente():
     def __init__(self, cliente:Cliente, numero,senha):
         self._conta = numero
         self._titulares = [cliente]
         self._senha = senha
         self._saldo = 0        
-        self._cheque_especial = Conta_corrente.verificar_cheque_especial(self)
+        self._cheque_especial = 0
     
     @property
     def conta(self):
@@ -44,7 +41,11 @@ class Conta_corrente():
 
     @property
     def titulares(self):
-        return self._titulares
+        nomes = []
+        for cliente in self._titulares:
+            nomes.append(cliente.nome)
+        return (',').join(nomes)
+
 
     @property
     def senha(self):
@@ -61,42 +62,51 @@ class Conta_corrente():
     @property
     def cheque_especial(self):
         return self._cheque_especial
+    
+    @cheque_especial.setter
+    def cheque_especial(self, valor):
+        self._cheque_especial = valor
 
-  
-    def verificar_cheque_especial(self):
-        cheque_especial = []
-        for cliente in self.titulares:
+
+
+
+    def permissao_cheque(self):
+        qtd_mulheres = 0
+        total_renda = 0
+        for cliente in self._titulares:
+            if cliente.mulher == True:
+                qtd_mulheres += 1
+                total_renda += float(cliente.renda)
+                media_renda = total_renda/qtd_mulheres
+                self.cheque_especial = media_renda
+                return True
+            else:
+                self.cheque_especial_ = 0
+                return False            
+        
+    def sacar(self,valor):
+        permissao = self.permissao_cheque()
+        if self.saldo > 0 and self.saldo >=valor:
+            print(f'Iniciando operação para sacar {valor}')
+            self.saldo -= valor
+            print(f'Operação realizada. Saldo:{self.saldo}')
+            print('-------------------------------------------------------------------------------------------')
+        elif permissao:
+            limite = self.cheque_especial
             # from pdb import set_trace;set_trace()
-            if Cliente.mulher is True:
-                cheque_especial.append(cliente.renda)
-                valor = statistics.mean(cheque_especial)
-            else:
-                valor = 0        
-                
-        return valor
-        
-    def sacar(self,valor,nome):
 
-        titular_acessando =  Conta_corrente.validar_titular(self,nome)
-        
-        if titular_acessando :
-            print(f'Iniciando operação saque{valor}')
-            if self.titular[titular_acessando].mulher == True:
-                print(self.saldo)
-                if self.saldo >= 0 and self.saldo < self.cheque_especial :
-
-                    self.saldo -= valor 
-                    print(f'Operação realizada. Saldo:{self.saldo}')
-                else:
-                    print(f'Valor excede limite. Saldo:{self.saldo}')
-
-            elif(self.saldo > 0):
+            if (self.saldo - valor) >= (-limite):
                 self.saldo -= valor
-                print(f'Operação realizada. Saldo:{self.saldo}')
+                print('Cheque especial ativado!')
+                print(f'Operação realizada. Saldo:{self.saldo} Limite: {self.cheque_especial} Disponível:{limite + self.saldo}')
+                print('-------------------------------------------------------------------------------------------')
             else:
-                print(f'Valor excede limite. Saldo:{self.saldo}')
+                print('Limite do cheque especial atingido!')
+                print(f'Operação não realizada. Saldo:{self.saldo} Limite: {limite} Disponível:{limite + self.saldo}')
+                print('-------------------------------------------------------------------------------------------')
         else:
-            raise Exception('Cliente informado não é titular dessa conta.')
+            print('***Saldo insuficiente. Sem permissão de cheque especial***')
+            print(f'Operação não realizada. Saldo: {self.saldo}')
 
     def depositar(self,valor):
         self.saldo += valor
@@ -107,8 +117,6 @@ class Conta_corrente():
 
     def __str__(self):
         return f'{self.conta} {self.titulares}{self._senha}{self.saldo} {self.cheque_especial}'
-
-
 class Banco_delas():
     contas = []
     
@@ -118,75 +126,70 @@ class Banco_delas():
 
     def abrir():
         Banco_delas()
+        print('\n****************************')
+        print('BEM VINDA AO BANCO DELAS!')
         print('****************************')
-        print('BEM VINDA ao BANCO DELAS!')
-        print('****************************')
-        print('O que deseja?')
+        print('O que deseja?\n')
         print("1 - Abrir conta")
         print("2 - Ver Saldo")
-        print("4 - Adicionar Titular")
-        print("5 - Sacar")
-        print("6 - Depositar")
-        print("7 - Sair")
+        print("3 - Adicionar Titular")
+        print("4 - Sacar")
+        print("5 - Depositar")
+        print("6 - Sair\n")
 
-        escolha = input('Digite a opção desejada:').upper()
+        escolha = input('Digite a opção desejada: ').upper()
 
         match escolha:
             case "1":
                 print('-------------------------------------------------------------------------------------------')
-                print("Ebaaa!! Vamos abrir uma conta!\n")
+                print("Oba!! Vamos abrir uma conta!")
+                print('-------------------------------------------------------------------------------------------')
+
                 Banco_delas.abrir_conta()
 
             case "2":
                 print('-------------------------------------------------------------------------------------------')
+                print("Beleza! Vamos verificar seu saldo!")
+                print('-------------------------------------------------------------------------------------------')
 
-                print("Insira seu nome:ver dados")
                 titular = input('Digite seu nome:')
                 senha = (input('Digite sua senha:')).upper()
-                # valor = float(input('Qual o valor? '))
- 
                 conta_valida =  Banco_delas.validar_titular(titular=titular, senha=senha)
-                tentativas = 0
-                if True in conta_valida:
-                    # from pdb import set_trace;set_trace()
-                    conta = conta_valida[1].get('conta')
-                    # permissão = 'não'
-                    # if conta.get('mulher') == True:
-                    #     permissão = 'sim'
-                    #     valor_cheque_especial = conta.get('cheque_especial')
-
-                    print(f'Conta: {conta.conta} Saldo: {conta.saldo}')
-                    # \n Cheque_especial:{permissão} -- {valor_cheque_especial}')
-                 
-                    time.sleep(3)
-                    Banco_delas.voltar_menu()
-                elif tentativas <= 3:
-                    print('Senha inválida')
-                    tentativas += 1
-                    time.sleep(3)
-                    Banco_delas.abrir()
-                else:
-                    print('****************************')
-                    print('Você atingiu o limite de tentativas inválidas.')
-                    time.sleep(3)
-                    Banco_delas.voltar_menu()
-                
-
+                conta = conta_valida.get('conta')
+                print(f'Número da conta: {conta.conta} Saldo: {conta.saldo} Titular(s):{conta.titulares}')
+                time.sleep(3)
+                Banco_delas.voltar_menu()
+               
             case "3":
                 print('-------------------------------------------------------------------------------------------')
+                print("Opa! Vamos adicionar mais um titular!")
+                print("Mas primeiro, vamos validar seu acesso a conta!")
+                print('-------------------------------------------------------------------------------------------')
 
-                print("Insira seu nome:cadastro")
-            
+                titular = input('Digite seu nome:')
+                senha = (input('Digite sua senha:')).upper()
+                conta_valida =  Banco_delas.validar_titular(titular=titular, senha=senha)
+                conta = conta_valida.get('conta')
+                Banco_delas.add_titular(conta)
+                print(f'Operação realizada. Titular(s):{conta.titulares}')   
+                time.sleep(3)
+                Banco_delas.voltar_menu()         
+      
             case "4":
                 print('-------------------------------------------------------------------------------------------')
-
-                print("Insira seu nome:novo titular")
-
-            case "5":
+                print("Vamos sacar!")
                 print('-------------------------------------------------------------------------------------------')
 
-                print("Insira seu nome:sacar")
-            case "6":
+                titular = input('Digite seu nome:') 
+                senha = (input('Digite sua senha:')).upper()
+                valor = float(input('Qual o valor? '))
+                conta_valida =  Banco_delas.validar_titular(titular=titular, senha=senha)
+                conta = conta_valida.get('conta')
+                conta.sacar(valor=valor)
+                time.sleep(3)
+                Banco_delas.voltar_menu()
+            
+            case "5":
                 print('-------------------------------------------------------------------------------------------')
                 print("Vamos depositar!\n")
                 titular = input('Digite seu nome:')
@@ -194,31 +197,16 @@ class Banco_delas():
                 valor = float(input('Qual o valor? '))
  
                 conta_valida =  Banco_delas.validar_titular(titular=titular, senha=senha)
-                tentativas = 0
-                if True in conta_valida:
-                    conta = conta_valida[1].get('conta')
-                    conta.depositar(valor)
-                    time.sleep(3)
-                    Banco_delas.voltar_menu()
-                elif tentativas <= 3:
-                    print('Senha inválida')
-                    tentativas += 1
-                    time.sleep(3)
-                    Banco_delas.abrir()
-                else:
-                    print('****************************')
-                    print('Você atingiu o limite de tentativas inválidas.')
-                    time.sleep(3)
-                    Banco_delas.voltar_menu()
-
-            case "7":
-                print('-------------------------------------------------------------------------------------------')
-                print("tchau")
-                print("Obrigada por escolher o Banco Delas!")
-
-            case "P":
-                from pdb import set_trace;set_trace()
-
+                conta = conta_valida.get('conta')
+                conta.depositar(valor=valor)
+                time.sleep(3)
+                Banco_delas.voltar_menu()
+            
+            case "6":
+                print('\n-------------------------------------------------------------------------------------------')
+                print("Até logo!")
+                print("Obrigada por escolher o Banco Delas!\n")
+          
             case _:
                 print('-------------------------------------------------------------------------------------------')
                 print(f'Você digitou {escolha}.Esta opção não esta no menu!\nEscolha entre os números de 1-7.\nCaso precise de ajuda, acesse: www.bancodela.com ou entre em contato com a sua agência')
@@ -237,15 +225,40 @@ class Banco_delas():
                 Banco_delas.abrir()
             case _:
                 print('-------------------------------------------------------------------------------------------')
-                print("tchau")
+                print("Até logo! ")
                 print("Obrigada por escolher o Banco Delas!")
 
     def validar_titular(titular, senha):
         for i, conta in enumerate(Banco_delas.contas):
+            # from pdb import set_trace;set_trace()
             if senha == conta.get('senha'):
                     print(f'achei {conta}')
                     conta_valida = conta
-                    return (True, conta_valida)
+                    return conta_valida
+            elif titular == conta.get('titular'):
+                    print('Oops! Senha inválida')
+                    time.sleep(3)
+                    Banco_delas.abrir()
+            else:
+                print(f'\nConta não localizada. Titular informado: {titular}')
+                time.sleep(3)
+                Banco_delas.abrir()
+        else:
+            print(f'\nConta não localizada. Titular informado: {titular}')
+            time.sleep(3)
+            Banco_delas.abrir()
+    
+    def add_titular(self,conta:Conta_corrente):
+        nome= input('Digite o nome do novo titular: ')
+        mulher = input('Novo titular se declara mulher? 1-Sim 2-Não 3-Prefiro não responder! ')
+        match mulher:
+            case "1":
+                mulher = True
+            case _:
+                mulher = False
+        renda = float(input('Digite a renda mensal do novo titular:'))
+        cliente = Cliente(nome=nome,mulher=mulher, renda=renda)
+        conta._titulares.append(cliente)
 
     def abrir_conta():
         numero = 0
@@ -263,12 +276,12 @@ class Banco_delas():
         # try:
         alphabet = string.ascii_letters + string.digits
         senha  = ''.join(secrets.choice(alphabet) for i in range(8))
-        Cliente(nome=nome,mulher=mulher, renda=renda, senha = senha)
+        cliente = Cliente(nome=nome,mulher=mulher, renda=renda)
        
         numero += 1
-        dados_conta = Conta_corrente(Cliente, numero = numero, senha = senha)
+        dados_conta = Conta_corrente(cliente=cliente, numero = numero, senha = senha)
         Banco_delas.contas.append({
-                'titular': Cliente.nome,
+                'titular': cliente.nome,
                  'numero': numero,
                  'senha': senha.upper(),
                  'conta': dados_conta
@@ -279,19 +292,9 @@ class Banco_delas():
         time.sleep(3)
         Banco_delas.voltar_menu()
 
-   
-
-    def add_titular(self,cliente:Cliente):
-        pass
-
     def __str__(self):
         total_clientes = len(Banco_delas.contas) 
         return f'Numero de clientes: {total_clientes}'
 
 Banco_delas.abrir()
-
-# Banco_delas.abrir_conta()
-# print(Banco_delas.contas[0]['conta'])a
-
-
-# CqxZS5z1
+print(Banco_delas())
