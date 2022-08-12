@@ -66,7 +66,6 @@ class Conta(ABC):
     def sacar(self, valor):
         pass
 
-
 class Conta_corrente(Conta):
     def __init__(self, numero,titular,senha):
         super().__init__(titular,senha)
@@ -133,7 +132,7 @@ class Conta_corrente(Conta):
         return f'Conta de número{self.conta} - Titulares:{self.titulares} -Senha: {self._senha} -Saldo: {self.saldo} - Cheque_especial{permissao}' 
 class Banco_delas():
     contas = []
-    tempo_painel = 2
+    tempo_painel = 3
     
 
     def __init__(self):
@@ -176,7 +175,8 @@ class Banco_delas():
                     message_saldo = f'Número da conta: {conta.conta} Saldo: {conta.saldo} Titular(s):{conta.titulares}'
                     if permissao:
                         message_cheque_especial = f' | Direito a cheque especial. Limite: {conta.cheque_especial} |'
-                    print (message_saldo + message_cheque_especial) if permissao else message_saldo
+                    
+                    print(message_saldo + message_cheque_especial) if permissao else  print(message_saldo)
                     
                     time.sleep(Banco_delas.tempo_painel)
                     Banco_delas.voltar_menu()
@@ -241,7 +241,7 @@ class Banco_delas():
         print('****************************')
         print("1 - Voltar ao menu principal")
         print("2 - Sair")
-        escolha1 = input('O que dejesa agora?')
+        escolha1 = input('O que deseja agora?')
 
         match escolha1:
             case '1':
